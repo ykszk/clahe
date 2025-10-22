@@ -1,5 +1,3 @@
-use std::usize;
-
 use image::*;
 use ndarray::prelude::*;
 use ndarray_stats::QuantileExt;
@@ -623,8 +621,9 @@ where
 {
     let (input_width, input_height) = input.dimensions();
     let arr = clahe_wo_interpolation(image2array_view(input), tile_width, tile_height, clip_limit)?;
+    let (vec, _offset) = arr.into_raw_vec_and_offset();
     Ok(
-        ImageBuffer::<Luma<S>, Vec<S>>::from_vec(input_width, input_height, arr.into_raw_vec())
+        ImageBuffer::<Luma<S>, Vec<S>>::from_vec(input_width, input_height, vec)
             .unwrap(),
     )
 }
@@ -759,7 +758,7 @@ where
     ImageBuffer::from_vec(
         input.ncols() as u32,
         input.nrows() as u32,
-        input.into_raw_vec(),
+        input.into_raw_vec_and_offset().0,
     )
     .unwrap()
 }
@@ -794,7 +793,7 @@ where
         tile_sample,
     )?;
     Ok(
-        ImageBuffer::<Luma<S>, Vec<S>>::from_vec(input_width, input_height, arr.into_raw_vec())
+        ImageBuffer::<Luma<S>, Vec<S>>::from_vec(input_width, input_height, arr.into_raw_vec_and_offset().0)
             .unwrap(),
     )
 }
