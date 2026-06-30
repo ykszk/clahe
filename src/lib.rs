@@ -534,11 +534,7 @@ where
     });
     for y in 0..input_height {
         hist.assign(&hist_prev_row);
-        let tile_top = if y < tile_height / 2 {
-            0
-        } else {
-            y - tile_height / 2
-        };
+        let tile_top = y.saturating_sub(tile_height / 2);
         if tile_top > 0 && tile_top < input_height - tile_height {
             // remove top row
             let row = input.slice(s![(tile_top - 1) as usize, 0..tile_width as usize]);
@@ -559,11 +555,7 @@ where
         }
 
         for x in 0..input_width {
-            let tile_left = if x < tile_width / 2 {
-                0
-            } else {
-                x - tile_width / 2
-            };
+            let tile_left = x.saturating_sub(tile_width / 2);
             let tile_top = u32::min(tile_top, input_height - tile_height - 1);
             if tile_left > 0 && tile_left < input_width - tile_width {
                 // remove left column
@@ -739,7 +731,7 @@ fn calculate_lut_weights_for_position(
     }
 }
 
-pub fn image2array_view<T>(input: &ImageBuffer<Luma<T>, Vec<T>>) -> ArrayView2<T>
+pub fn image2array_view<T>(input: &'_ ImageBuffer<Luma<T>, Vec<T>>) -> ArrayView2<'_, T>
 where
     T: image::Primitive + Into<usize> + Into<u32> + Ord + 'static,
 {
