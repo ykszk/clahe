@@ -36,8 +36,8 @@ fn clip_hist(hist: &mut HistType, limit: u32) {
         }
 
         let residual = (clipped - redist_batch * hist_size) as usize;
-        if residual > 0 {
-            let step = usize::max(1, hist_size as usize / residual);
+        if let Some(step) = (hist_size as usize).checked_div(residual) {
+            let step = usize::max(1, step);
             let end = step * residual;
             hist.iter_mut().take(end).step_by(step).for_each(|count| {
                 *count += 1;
@@ -67,8 +67,8 @@ fn clip_hist_w_end(hist: &mut HistType, limit: u32, calc_end: usize) {
         }
 
         let residual = (clipped - redist_batch * hist_size) as usize;
-        if residual > 0 {
-            let step = usize::max(1, hist_size as usize / residual);
+        if let Some(step) = (hist_size as usize).checked_div(residual) {
+            let step = usize::max(1, step);
             let end = usize::min(calc_end, step * residual);
             hist.iter_mut().take(end).step_by(step).for_each(|count| {
                 *count += 1;
@@ -614,10 +614,7 @@ where
     let (input_width, input_height) = input.dimensions();
     let arr = clahe_wo_interpolation(image2array_view(input), tile_width, tile_height, clip_limit)?;
     let (vec, _offset) = arr.into_raw_vec_and_offset();
-    Ok(
-        ImageBuffer::<Luma<S>, Vec<S>>::from_vec(input_width, input_height, vec)
-            .unwrap(),
-    )
+    Ok(ImageBuffer::<Luma<S>, Vec<S>>::from_vec(input_width, input_height, vec).unwrap())
 }
 
 pub fn clahe_ndarray<S, T>(
@@ -784,10 +781,12 @@ where
         clip_limit,
         tile_sample,
     )?;
-    Ok(
-        ImageBuffer::<Luma<S>, Vec<S>>::from_vec(input_width, input_height, arr.into_raw_vec_and_offset().0)
-            .unwrap(),
+    Ok(ImageBuffer::<Luma<S>, Vec<S>>::from_vec(
+        input_width,
+        input_height,
+        arr.into_raw_vec_and_offset().0,
     )
+    .unwrap())
 }
 
 pub fn pad_array<A, S>(

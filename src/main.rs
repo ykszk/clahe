@@ -134,7 +134,8 @@ fn main() -> Result<()> {
                     args.tile_sample,
                 )?
             };
-            let new_lum = Array1::from_shape_vec(new_lum.len(), new_lum.into_raw_vec_and_offset().0)?;
+            let new_lum =
+                Array1::from_shape_vec(new_lum.len(), new_lum.into_raw_vec_and_offset().0)?;
             arr_hsl.zip_mut_with(&new_lum, |hsl, lum| {
                 hsl.l = *lum as f32 / 255.0;
             });
