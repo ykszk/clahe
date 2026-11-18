@@ -4,7 +4,7 @@ use ndarray_rand::{rand_distr::Uniform, RandomExt};
 
 fn exec_clahe(size: usize, tile_sample: f64, random_input: bool) -> Array2<u8> {
     let arr: Array2<u8> = if random_input {
-        Array2::random((size, size), Uniform::new(0., 255.)).mapv(|e| e as u8)
+        Array2::random((size, size), Uniform::new(0., 255.).unwrap()).mapv(|e| e as u8)
     } else {
         Array2::zeros((size, size))
     };
@@ -38,7 +38,7 @@ fn criterion_benchmark(c: &mut Criterion) {
 
     for size in [512] {
         let arr: Array2<u8> =
-            Array2::random((size, size), Uniform::new(0., 255.)).mapv(|e| e as u8);
+            Array2::random((size, size), Uniform::new(0., 255.).unwrap()).mapv(|e| e as u8);
         let grid_width = 8;
         let grid_height = 8;
         let clip_limit = 40;
@@ -105,7 +105,8 @@ fn criterion_u16(c: &mut Criterion) {
     let mut group = c.benchmark_group("clahe u16");
     for max_value in [256u16, 1 << 9, 1 << 10, 1 << 11, 1 << 12] {
         let arr: Array2<u16> =
-            Array2::random((128, 128), Uniform::new(0., max_value as f64)).mapv(|e| e as u16);
+            Array2::random((128, 128), Uniform::new(0., max_value as f64).unwrap())
+                .mapv(|e| e as u16);
 
         let grid_width = 8;
         let grid_height = 8;

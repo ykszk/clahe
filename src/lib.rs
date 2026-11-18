@@ -1097,7 +1097,7 @@ mod tests {
     fn test_luts() -> Result<()> {
         let size = 512;
         let arr: Array2<u8> =
-            Array2::random((size, size), Uniform::new(0., 255.)).mapv(|e| e as u8);
+            Array2::random((size, size), Uniform::new(0., 255.).unwrap()).mapv(|e| e as u8);
         let grid_width = 8;
         let grid_height = 8;
         let clip_limit = 40;
